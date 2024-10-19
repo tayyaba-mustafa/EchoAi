@@ -1,6 +1,6 @@
 import os
 import streamlit as st
-import requests  # Use requests to make API calls
+from groq import Groq
 
 # Set page configuration
 st.set_page_config(page_title="AI Content Generator", page_icon="📝", layout="wide")
@@ -22,27 +22,19 @@ temperature = st.sidebar.slider("Creativity (Temperature)", 0.0, 1.0, 0.7)
 # Input for user prompt
 prompt = st.text_area("Enter your content prompt:", help="Type a brief idea for your social media post.")
 
-# Set up the Groq API key
+# Set up the Groq client with your API key
 GROQ_API_KEY = "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"
 os.environ["GROQ_API_KEY"] = GROQ_API_KEY
 
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
+
 # Function to generate content using Groq Llama
 def generate_content_with_groq(prompt):
-    url = "https://api.groq.com/v1/chat/completions"  # Update with the correct endpoint
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "messages": [{"role": "user", "content": prompt}],
-        "model": "llama3-8b-8192"
-    }
-
-    response = requests.post(url, headers=headers, json=data)
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
-    else:
-        return f"Error: {response.status_code} - {response.text}"
+    chat_completion = client.chat.completions.create(
+        messages=[{"role": "user", "content": prompt}],
+        model="llama3-8b-8192"
+    )
+    return chat_completion.choices[0].message.content
 
 # Button to generate content
 if st.button("Generate Content"):
