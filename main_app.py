@@ -42,11 +42,10 @@ def generate_content_with_groq(prompt):
 # Function to mimic brand voice
 def mimic_brand_voice(content, brand_voice):
     prompt = f"Rewrite the following content in a {brand_voice} tone: {content}"
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=prompt,
-        max_tokens=150
-    )
+    response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+    messages=[{"role": "user", "content": prompt}]
+)
     return response.choices[0].text.strip()
 
 # Button to generate content
